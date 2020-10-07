@@ -12,9 +12,13 @@ import io.netty.util.CharsetUtil;
  * Listing 2.1 EchoServerHandler
  *
  * @author <a href="mailto:norman.maurer@gmail.com">Norman Maurer</a>
+ *
+ * 实现服务器的业务逻辑
  */
 @Sharable
 public class EchoServerHandler extends ChannelInboundHandlerAdapter {
+
+    //有消息传来时，调用此回调函数
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         ByteBuf in = (ByteBuf) msg;

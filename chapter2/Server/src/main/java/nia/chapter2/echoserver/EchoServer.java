@@ -36,22 +36,28 @@ public class EchoServer {
 
     public void start() throws Exception {
         final EchoServerHandler serverHandler = new EchoServerHandler();
+        //用来注册多个channel，然后轮询channel是否有事件
         EventLoopGroup group = new NioEventLoopGroup();
         try {
+            //服务端启动引导
             ServerBootstrap b = new ServerBootstrap();
-            b.group(group)
-                .channel(NioServerSocketChannel.class)
-                .localAddress(new InetSocketAddress(port))
+            //服务端配置
+            b.group(group) //事件循环
+                .channel(NioServerSocketChannel.class) //channel类型
+                .localAddress(new InetSocketAddress(port)) //服务端监听的ip和端口
                 .childHandler(new ChannelInitializer<SocketChannel>() {
+                    //有新连接时会新建channel，新channel初始化时在channel管道后添加一个handler
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast(serverHandler);
                     }
                 });
 
+            //同步的绑定服务器（即阻塞的等待异步操作完成）
             ChannelFuture f = b.bind().sync();
             System.out.println(EchoServer.class.getName() +
                 " started and listening for connections on " + f.channel().localAddress());
+            //同步的关闭channel
             f.channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully().sync();
